@@ -3,8 +3,8 @@ import os
 import glob
 import shutil
 from jamo import h2j, hangul_to_jamo, j2hcj
-# from g2pk import G2p
-# import jamotools
+from g2pk import G2p
+import jamotools
 import math
 import tqdm
 
@@ -54,7 +54,7 @@ def write_script(script_ad, path):
                 try:
                     result_sound = r.recognize_google(audio, language='ko-KR')  # STT
                     # print("%s/%s" % (path, filename)+"|"+result_sound+'.')
-                    script.write("%s/%s" % (path, filename)+"|"+result_sound+'.'+'\n')  # 경로 확인 한 번 필요 (스크립트 형식 ex: 1/2_0000.wav)
+                    script.write("%s/%s" % (path, filename)+"|"+result_sound+'.'+'\n') #경로 확인 한 번 필요 (스크립트 형식 ex: 1/2_0000.wav)
                 except sr.UnknownValueError:
                     print("Google Speech Recognition could not understand audio")
                 except sr.RequestError as e:
@@ -79,7 +79,7 @@ def audio_text_pair(meta_path):
 
 ##lexicon.txt 파일 생성
 # 한글 문장을 초/중/종성 형태로 분리, 단독 사용 안함
-# g2p = G2p()  # grapheme to phoneme
+g2p = G2p()  # grapheme to phoneme
 
 
 def jamo_split(content):
@@ -110,7 +110,7 @@ def make_p_dict(meta_path, position):
 # p_dict = make_p_dict(base + meta_name, 1)
 
 
-def make_lexicon(p_dict):
+def make_lexicon(p_dict, path):
     with open(path + "p_lexicon.txt", "w") as f:
         for k, v in p_dict.items():
             f.write("{}\t{}\n".format(k, v))

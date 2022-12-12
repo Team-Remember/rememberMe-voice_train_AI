@@ -2,8 +2,10 @@ import os
 import time
 import boto3
 from app import config
-from app.before_mfa_voice_train import move_file, write_script, audio_text_pair
-
+from app.before_mfa_voice_train import move_file, write_script, audio_text_pair, make_p_dict, make_lexicon
+from app.after_mfa_voice_train import after_mfa
+import subprocess
+from subprocess import Popen
 
 def voice_train_process(request_data):
     start = time.time()
@@ -18,10 +20,17 @@ def voice_train_process(request_data):
 
     # before mfa
     voice_path = './voice/'
+    script_file = "script.txt" 
     move_file(voice_path)
-    write_script(voice_path + 'script.txt', voice_path)  # 음성파일 있는 폴더에 넣지 말고 분리해서 만들고->음성폴더 있는곳에 넣기
-    script_file = "script.txt"  # 스크립트 파일명
+    write_script(voice_path + script_file, voice_path) 
     audio_text_pair(voice_path + script_file)
+    p_dict = make_p_dict(voice_path + script_file, 1)
+    make_lexicon(p_dict, voice_path)
+
     # mfa
+    os.system('conda activate aligner')
+    os.system('mfa train --clean')
+    os.system('conda activate remember')
 
     # after mfa
+    after_mfa()
